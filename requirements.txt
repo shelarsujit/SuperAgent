@@ -1,0 +1,9 @@
+langgraph
+transformers
+torch
+langchain
+python-multipart
+beautifulsoup4
+pypdf
+pandas
+requests
