@@ -17,3 +17,4 @@ pip install -r requirements.txt
 
 # Start the API
 uvicorn src.services.api.fastapi_app.main:app --reload
+```
