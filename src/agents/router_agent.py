@@ -4,7 +4,13 @@ from .expert_agents.text_agent import TextAgent
 from .expert_agents.image_agent import ImageAgent
 from .expert_agents.file_agent import FileAgent
 from .expert_agents.link_agent import LinkAgent
-from transformers import pipeline  # For input classification
+import os
+from src.services.azure_client import zero_shot_classify
+
+try:
+    from transformers import pipeline  # Fallback when Azure is not configured
+except Exception:  # pragma: no cover - transformers may not be installed
+    pipeline = None
 
 class RouterAgent:
     def __init__(self, config: Dict[str, Any]):
@@ -15,11 +21,16 @@ class RouterAgent:
             "link": LinkAgent()
         }
         
-        # Initialize classifier for input routing
-        self.classifier = pipeline(
-            "zero-shot-classification",
-            model="facebook/bart-large-mnli"
-        )
+        # Determine whether Azure endpoints are configured
+        self.use_azure = bool(os.environ.get("AZURE_OPENAI_CLASSIFY_ENDPOINT"))
+        if not self.use_azure and pipeline is not None:
+            # Fallback to local transformers pipeline
+            self.classifier = pipeline(
+                "zero-shot-classification",
+                model="facebook/bart-large-mnli",
+            )
+        else:
+            self.classifier = None
         
         # Define the workflow graph
         self.workflow = MessageGraph()
@@ -29,12 +40,17 @@ class RouterAgent:
         self.labels = ["text", "image", "file", "link"]
 
     def _classify_input(self, state: Dict[str, Any]) -> Literal["text", "image", "file", "link"]:
-        """Classify input using zero-shot classification"""
-        result = self.classifier(
-            state["input"],
-            candidate_labels=self.labels
-        )
-        return result["labels"][0]  # Return top predicted label
+        """Classify input using Azure or local model."""
+        if self.use_azure:
+            return zero_shot_classify(state["input"], self.labels)
+        elif self.classifier is not None:
+            result = self.classifier(
+                state["input"],
+                candidate_labels=self.labels,
+            )
+            return result["labels"][0]
+        else:
+            return "text"
 
     def _route_input(self, state: Dict[str, Any]) -> Literal["text", "image", "file", "link"]:
         """Routing decision logic"""

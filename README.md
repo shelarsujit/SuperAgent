@@ -15,6 +15,11 @@ git clone https://github.com/yourusername/SuperAgent.git
 cd SuperAgent
 pip install -r requirements.txt
 
+# Configure Azure endpoints
+export AZURE_OPENAI_API_KEY=<your-key>
+export AZURE_OPENAI_ENDPOINT=<https://your-resource.openai.azure.com>
+export AZURE_OPENAI_DEPLOYMENT_NAME=<deployment>
+
 # Start the API
 uvicorn src.services.api.fastapi_app.main:app --reload
 ```
