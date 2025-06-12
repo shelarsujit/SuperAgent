@@ -15,6 +15,17 @@ git clone https://github.com/yourusername/SuperAgent.git
 cd SuperAgent
 pip install -r requirements.txt
 
+# Configure Azure endpoints
+export AZURE_OPENAI_API_KEY=<your-key>
+export AZURE_OPENAI_ENDPOINT=<https://your-resource.openai.azure.com>
+export AZURE_OPENAI_DEPLOYMENT_NAME=<deployment>
+
 # Start the API
 uvicorn src.services.api.fastapi_app.main:app --reload
 ```
+
+## Orchestration
+The project uses Azure-hosted models when corresponding environment variables are set. Deploy your models to Azure OpenAI or Azure Cognitive Services and provide the deployment names or endpoint URLs as environment variables such as `AZURE_CLASSIFY_DEPLOYMENT` or `AZURE_VECTOR_ENDPOINT`.
+
+## Agentic Core
+LangGraph is used throughout the `core` modules to manage short- and long-term memory as well as high level planning. These graphs can call Azure endpoints for tasks like summarization or classification, allowing flexible orchestration across services.

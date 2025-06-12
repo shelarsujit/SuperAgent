@@ -2,6 +2,7 @@ from typing import Dict, Any
 import PyPDF2
 import pandas as pd
 from io import StringIO
+from datetime import datetime
 
 class FileAgent:
     def __init__(self):
@@ -34,7 +35,7 @@ class FileAgent:
             "output": text,
             "metadata": {
                 "file_type": "pdf",
-                "timestamp": "2023-10-01T12:00:00Z"  # Add actual timestamp logic
+                "timestamp": datetime.utcnow().isoformat()
             }
         }
 
@@ -49,6 +50,6 @@ class FileAgent:
             "output": df.to_dict(),
             "metadata": {
                 "file_type": "csv",
-                "timestamp": "2023-10-01T12:00:00Z"  # Add actual timestamp logic
+                "timestamp": datetime.utcnow().isoformat()
             }
         }

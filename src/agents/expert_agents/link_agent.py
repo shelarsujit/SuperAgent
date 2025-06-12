@@ -1,6 +1,7 @@
 from typing import Dict, Any
 import requests
 from bs4 import BeautifulSoup
+from datetime import datetime
 
 class LinkAgent:
     def __init__(self):
@@ -26,6 +27,6 @@ class LinkAgent:
             },
             "metadata": {
                 "source": url,
-                "timestamp": "2023-10-01T12:00:00Z"  # Add actual timestamp logic
+                "timestamp": datetime.utcnow().isoformat()
             }
         }
