@@ -48,10 +48,18 @@ class RouterAgent:
         self.workflow.add_node("router", self._route_input)
         
         for agent_type in self.labels:
-            self.workflow.add_node(
-                agent_type,
-                lambda state, agent_type=agent_type: self.agents[agent_type].process(state)
-            )
+            if agent_type == "file":
+                self.workflow.add_node(
+                    agent_type,
+                    lambda state, agent_type=agent_type: self.agents[agent_type].process(
+                        state["input"], state.get("file_type", "")
+                    ),
+                )
+            else:
+                self.workflow.add_node(
+                    agent_type,
+                    lambda state, agent_type=agent_type: self.agents[agent_type].process(state["input"])
+                )
 
         # Define edges
         self.workflow.add_edge("router", "text")
