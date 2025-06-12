@@ -11,8 +11,8 @@ An intelligent agent routing system with multi-modal capabilities.
 
 ## Quick Start
 ```bash
-git clone https://github.com/yourusername/supermodel-router.git
-cd supermodel-router
+git clone https://github.com/yourusername/SuperAgent.git
+cd SuperAgent
 pip install -r requirements.txt
 
 # Start the API
