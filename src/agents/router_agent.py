@@ -97,17 +97,22 @@ class RouterAgent:
 
 # Example usage
 if __name__ == "__main__":
-    router = RouterAgent(config={})
-    
-    # Test different inputs
-    test_cases = [
-        {"content": "What is quantum computing?"},
-        {"content": "https://example.com/image.jpg"},
-        {"content": "document.pdf", "metadata": {"file_type": "pdf"}},
-        {"content": "https://news.example.com/article"}
-    ]
-    
-    for case in test_cases:
-        response = router.process_input(case)
-        print(f"Input: {case['content']}")
-        print(f"Response: {response}\n")
+    import asyncio
+
+    async def run_tests():
+        router = RouterAgent(config={})
+
+        # Test different inputs
+        test_cases = [
+            {"content": "What is quantum computing?"},
+            {"content": "https://example.com/image.jpg"},
+            {"content": "document.pdf", "metadata": {"file_type": "pdf"}},
+            {"content": "https://news.example.com/article"}
+        ]
+
+        for case in test_cases:
+            response = await router.process_input(case)
+            print(f"Input: {case['content']}")
+            print(f"Response: {response}\n")
+
+    asyncio.run(run_tests())
