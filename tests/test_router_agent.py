@@ -76,6 +76,18 @@ transformers_module = types.ModuleType("transformers")
 transformers_module.pipeline = dummy_pipeline
 sys.modules["transformers"] = transformers_module
 
+# Minimal requests stub for Azure client
+requests_module = types.ModuleType("requests")
+def dummy_post(*args, **kwargs):
+    class R:
+        def raise_for_status(self):
+            pass
+        def json(self):
+            return {"label": "text"}
+    return R()
+requests_module.post = dummy_post
+sys.modules["requests"] = requests_module
+
 # Import RouterAgent after stubs are in place
 RouterAgent = importlib.import_module("src.agents.router_agent").RouterAgent
 
