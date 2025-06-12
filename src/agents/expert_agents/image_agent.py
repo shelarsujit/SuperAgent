@@ -5,6 +5,7 @@ from PIL import Image
 import requests
 from io import BytesIO
 from transformers import BlipProcessor, BlipForConditionalGeneration
+from datetime import datetime
 
 class ImageAgent:
     def __init__(self, model_name: str = "Salesforce/blip-image-captioning-base"):
@@ -36,6 +37,6 @@ class ImageAgent:
             "output": caption,
             "metadata": {
                 "model": self.model_name,
-                "timestamp": "2023-10-01T12:00:00Z"  # Add actual timestamp logic
+                "timestamp": datetime.utcnow().isoformat()
             }
         }

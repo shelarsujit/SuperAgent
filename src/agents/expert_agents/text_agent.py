@@ -2,6 +2,7 @@ from typing import Dict, Any
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 import os
+from datetime import datetime
 from langchain.llms import OpenAI, AzureOpenAI
 
 class TextAgent:
@@ -32,6 +33,6 @@ class TextAgent:
             "output": response,
             "metadata": {
                 "model": self.model_name,
-                "timestamp": "2023-10-01T12:00:00Z"  # Add actual timestamp logic
+                "timestamp": datetime.utcnow().isoformat()
             }
         }
