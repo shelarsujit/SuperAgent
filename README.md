@@ -29,3 +29,13 @@ The project uses Azure-hosted models when corresponding environment variables ar
 
 ## Agentic Core
 LangGraph is used throughout the `core` modules to manage short- and long-term memory as well as high level planning. These graphs can call Azure endpoints for tasks like summarization or classification, allowing flexible orchestration across services.
+
+## Frontend Usage
+The `frontend/` directory contains a minimal WebSocket chat interface. After starting the API server you can serve the static files using Python's built in HTTP server:
+
+```bash
+# from the repository root
+python -m http.server --directory frontend 8080
+```
+
+Then open `http://localhost:8080` in your browser. The page lets you send text messages over the WebSocket and upload files through the `/upload` endpoint.
