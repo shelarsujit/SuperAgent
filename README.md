@@ -43,3 +43,13 @@ python -m http.server --directory frontend 8080
 ```
 
 Then open `http://localhost:8080` in your browser. The page lets you send text messages over the WebSocket and upload files through the `/upload` endpoint.
+
+### React Interface
+If you prefer a React-based frontend, open the files under `frontend/react`. Serve them with Python as well:
+
+```bash
+# from the repository root
+python -m http.server --directory frontend/react 8090
+```
+
+Visit `http://localhost:8090` to use the React chat client.
