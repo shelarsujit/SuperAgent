@@ -34,6 +34,9 @@ The project uses Azure-hosted models when the corresponding environment variable
 ## Agentic Core
 LangGraph is used throughout the `core` modules to manage short- and long-term memory as well as high level planning. These graphs can call Azure endpoints for tasks like summarization or classification, allowing flexible orchestration across services.
 
+### Memory Persistence
+Short-term context is automatically summarized after each interaction and the summary is appended to `long_term_memory.json`. Set `AZURE_OPENAI_SUMMARIZE_ENDPOINT` if you want Azure to generate the summaries; otherwise a simple concatenation of recent messages is stored.
+
 ## Frontend Usage
 The `frontend/` directory contains a minimal WebSocket chat interface. After starting the API server you can serve the static files using Python's built in HTTP server:
 
