@@ -112,3 +112,25 @@ async def test_process_input_routes_text():
     assert result["status"] == "success"
     assert result["result"] == {"handled_by": "text"}
 
+
+@pytest.mark.asyncio
+async def test_memory_updates(tmp_path):
+    def dummy_build_workflow(self):
+        self.labels = ["text", "image", "file", "link"]
+        self.workflow = DummyMessageGraph()
+        self.workflow.add_node("router", self._route_input)
+        for agent_type in self.labels:
+            self.workflow.add_node(
+                agent_type,
+                lambda state, agent_type=agent_type: self.agents[agent_type].process(state)
+            )
+        self.workflow.set_entry_point("router")
+
+    RouterAgent._build_workflow = dummy_build_workflow
+
+    mem_file = tmp_path / "mem.json"
+    router = RouterAgent(config={"memory": {"long_path": str(mem_file), "short_capacity": 2}})
+    await router.process_input({"content": "hello"})
+    assert len(router.short_term.get_context()) == 1
+    assert len(router.long_term.get_all()) == 1
+

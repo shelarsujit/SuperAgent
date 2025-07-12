@@ -28,8 +28,8 @@ class ShortTermMemory:
             return text
 
     async def add_and_summarize(self, message: str) -> str:
-        async for result in self.graph.astream(message):
-            return result
+        self._add(message)
+        return self._summarize(message)
 
     def get_context(self) -> List[str]:
         return list(self.buffer)

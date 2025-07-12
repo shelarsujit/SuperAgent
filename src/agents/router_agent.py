@@ -6,6 +6,8 @@ from .expert_agents.file_agent import FileAgent
 from .expert_agents.link_agent import LinkAgent
 import os
 from src.services.azure_client import zero_shot_classify
+from src.core.memory.short_term import ShortTermMemory
+from src.core.memory.long_term import LongTermMemory
 
 try:
     from transformers import pipeline  # Fallback when Azure is not configured
@@ -32,10 +34,17 @@ class RouterAgent:
         else:
             self.classifier = None
         
+        # Memory components
+        mem_cfg = config.get("memory", {}) if config else {}
+        capacity = mem_cfg.get("short_capacity", 5)
+        storage = mem_cfg.get("long_path", "long_term_memory.json")
+        self.short_term = ShortTermMemory(capacity=capacity)
+        self.long_term = LongTermMemory(storage_path=storage)
+
         # Define the workflow graph
         self.workflow = MessageGraph()
         self._build_workflow()
-        
+
         # Configure available labels for classification
         self.labels = ["text", "image", "file", "link"]
 
@@ -102,6 +111,16 @@ class RouterAgent:
             # Collect and format results
             async for node_output in results:
                 if node_output is not None:
+                    text_in = str(input_data.get("content", ""))
+                    text_out = (
+                        node_output.get("output")
+                        if isinstance(node_output, dict)
+                        else str(node_output)
+                    )
+                    summary = await self.short_term.add_and_summarize(
+                        f"{text_in} {text_out}"
+                    )
+                    self.long_term.add(summary)
                     return {
                         "status": "success",
                         "result": node_output,
