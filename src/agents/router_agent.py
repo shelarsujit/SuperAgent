@@ -8,6 +8,7 @@ import os
 from src.services.azure_client import zero_shot_classify
 from src.core.memory.short_term import ShortTermMemory
 from src.core.memory.long_term import LongTermMemory
+from src.services.cosmos_client import CosmosConversationLogger
 
 try:
     from transformers import pipeline  # Fallback when Azure is not configured
@@ -40,6 +41,19 @@ class RouterAgent:
         storage = mem_cfg.get("long_path", "long_term_memory.json")
         self.short_term = ShortTermMemory(capacity=capacity)
         self.long_term = LongTermMemory(storage_path=storage)
+
+        # Optional Cosmos DB logging
+        cosmos_cfg = config.get("cosmos", {}) if config else {}
+        conn_str = os.environ.get("AZURE_COSMOS_CONNECTION_STRING")
+        db_name = cosmos_cfg.get("database", os.environ.get("AZURE_COSMOS_DATABASE", "SuperAgent"))
+        container_name = cosmos_cfg.get("container", os.environ.get("AZURE_COSMOS_CONTAINER", "conversations"))
+        if conn_str:
+            try:
+                self.cosmos_logger = CosmosConversationLogger(conn_str, db_name, container_name)
+            except Exception:  # pragma: no cover - optional dependency
+                self.cosmos_logger = None
+        else:
+            self.cosmos_logger = None
 
         # Define the workflow graph
         self.workflow = MessageGraph()
@@ -100,6 +114,12 @@ class RouterAgent:
         try:
             # Add to workflow state
             state = {"input": input_data["content"]}
+            conv_id = input_data.get("conversation_id", "default")
+            if self.cosmos_logger:
+                try:
+                    self.cosmos_logger.log_message(conv_id, "user", input_data["content"])
+                except Exception:
+                    pass
             
             # Handle special cases for files/links
             if "metadata" in input_data:
@@ -121,6 +141,11 @@ class RouterAgent:
                         f"{text_in} {text_out}"
                     )
                     self.long_term.add(summary)
+                    if self.cosmos_logger:
+                        try:
+                            self.cosmos_logger.log_message(conv_id, "agent", text_out)
+                        except Exception:
+                            pass
                     return {
                         "status": "success",
                         "result": node_output,
